@@ -21,9 +21,13 @@
         reader.onload = function(event) {           
             var img = new Image();                 
             img.onload = function() {              
-                canvas.width  = img.naturalWidth;  
-                canvas.height = img.naturalHeight; 
-                ctx.drawImage(img, 0, 0);          
+                ctx.width  = img.naturalWidth;  
+                ctx.height = img.naturalHeight;
+				canvas.width = ctx.width;
+				canvas.height = ctx.height; 
+                    
+				ctx.drawImage(img, 0, 0); 
+				     
             }                                     　
             img.src = event.target.result;        　
         }                                           
@@ -85,7 +89,7 @@
 								</ul>
 								<!-- 写真部分 -->
 								<div class="tab-content">
-										<div id="photo1" class="tab-pane active"> <canvas id="cnvs" width="500" height="500" style="border:1px solid #aaa"></canvas>
+										<div id="photo1" class="tab-pane active"> <canvas id="cnvs" width="1990" height="500" style="border:1px solid #aaa"></canvas>
 												<script type="text/javascript">
 														$(function(){
 														                // 準備
