@@ -11,29 +11,164 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js" integrity="sha512-ACqMrfAtm537AWzgx/xQ57JnFxXeq8RylQMGg4y/e6M2ew4Z8NycE8aId/Bt2ZE+w1gNsox3MgwxKl7SGMRdtA==" crossorigin="anonymous"></script>
   <script>
     function LoadImageFile(files, canvasName) {        　
-        var canvas = document.getElementById(canvasName); 
+        /**
+		var canvas = document.getElementById(canvasName); 
         var ctx = canvas.getContext('2d');          　
         var reader = new FileReader();              
         reader.onload = function(event) {           
             var img = new Image();                 
             img.onload = function() {              
-                ctx.width  = img.naturalWidth;  
-                ctx.height = img.naturalHeight;
-				canvas.width = ctx.width;
-				canvas.height = ctx.height; 
-                    
+                canvas.width = img.naturalWidth;
+				canvas.height = img.naturalHeight; 
+                canvas.style.width = canvas.width + "px";
+				canvas.style.height = canvas.height + "px";    
 				ctx.drawImage(img, 0, 0); 
-				     
+				alert(canvas.style.width + "," + canvas.style.height + ":" + canvas.width + "," + canvas.height);
             }                                     　
             img.src = event.target.result;        　
         }                                           
         reader.readAsDataURL(files[0]);             　　
+    	***/
+		var canvas = new fabric.Canvas(canvasName); 
+		var canvas_tmp = new fabric.Canvas('tmp');
+        var reader = new FileReader();              
+        reader.onload = function(event) {           
+            //alert(event.target.result);
+			canvas.clear();
+			var img = new Image();                 
+            img.onload = function() {              
+                canvas.setWidth(img.width);
+				canvas.setHeight(img.height);
+				canvas_tmp.setWidth(img.width);
+				canvas_tmp.setHeight(img.height);
+
+				var fabricImage = new fabric.Image(img);
+				canvas.clear();
+				canvas.add(fabricImage);
+
+				//手書きの矩形が作成されたら
+				canvas.on('path:created', function(options){
+					var path = options.path;
+					canvas.getObjects().forEach(o => { o.fill = 'blue'});
+					
+					//canvasTmpにパスをコピー
+					canvas_tmp.add(path);
+					canvas_tmp.getObjects().forEach(o2 => {o2.fill = 'blue'});
+					
+					console.log(path);
+					console.log(path.left + "," + path.top + ":" + path.width + "," + path.height);
+					//canvas.isDrawingMode = false;
+
+					//alert("パスが生成されました");
+
+					//ImageDataにパスサイズの画像を取得
+					var ctx = canvas_tmp.getContext("2d");
+					var ctx_src = canvas.getObjects("2d");
+					var ImageData = ctx.getImageData(parseInt(path.left), parseInt(path.top), parseInt(path.width), parseInt(path.height));
+					var outImageData = ctx.createImageData(parseInt(path.width), parseInt(path.height));
+					k=0;
+					console.log(parseInt(path.width) + "<--" + path.width + "------" + parseInt(path.height) + "<--" + path.height);
+					for(j=0; j<parseInt(path.height); j++){
+						mes="";
+						for(i=0; i<parseInt(path.width); i++){
+							var addr = j * parseInt(path.width) * 4 + i * 4;
+							var r = ImageData.data[addr + 0];
+							var g = ImageData.data[addr + 1];
+							var b = ImageData.data[addr + 2];
+							var a = ImageData.data[addr + 3];
+							
+							outImageData.data[addr + 0] = r;
+							outImageData.data[addr + 1] = g;
+							outImageData.data[addr + 2] = b;
+							outImageData.data[addr + 3] = a;
+							
+							if( b != 0){
+								mes=mes+"b";
+								//console.log("i="+i+",j="+j+":"+addr + "(" + (parseInt(i)+parseInt(path.left)) + "," + (parseInt(j)+parseInt(path.top)) + ")-(" + r + "," + g + "," + b +")");
+							}else{
+								mes=mes+".";
+							}
+						}
+						console.log(mes);
+						
+					}
+					ctx.putImageData(outImageData, 100, 100);
+					//console.log(r + "," + g + "," +b);
+				});
+				
+            }                                     　
+            img.src = event.target.result;      
+			// 手書き入力ON
+			canvas.isDrawingMode = true;　
+        }                                           
+        reader.readAsDataURL(files[0]);             　　
     
     }
+
+	function SizeChange(canvasName){
+		var canvas = document.getElementById(canvasName);
+		canvas.width = 700;
+		canvas.height = 500;
+		alert(canvasName);
+	}
+
+	function TestPixcel(canvasName){
+		var canvas = new fabric.Canvas(canvasName);
+		var canvas2 = new fabric.Canvas("tmp");
+		var cc = canvas.getContext('2d');
+		var cc2 = canvas2.getContext('2d');
+
+		var top = 0;
+		var left = 0;
+		var width = 255;
+		var height = 255;
+		var ImageData = cc.getImageData(top, left, width, height);
+		var data = ImageData;
+		for (var x = 0; x < width; ++x) {
+			for (var y = 0; y < height; ++y) {
+				// 対象pixelのindex（色情報があるので*4する） 
+				var index = (x + y * width) * 4;
+				data[index + 0] = x;
+				data[index + 1] = y;
+				data[index + 2] = (x + y) / 255;
+				data[index + 3] = 255;
+			};
+		};
+		ImageData.data = data;
+		var fabricImage = new fabric.Image(ImageData);
+		canvas2.add(fabricImage);
+		cc2.putImageData(ImageData, top, left);
+	}
+
+	function TestPixcel2(canvasName){
+		var canvas = new fabric.Canvas(canvasName);
+		var canvas2 = new fabric.Canvas("tmp");
+		var ctx = canvas.getContext('2d');
+		var data = ctx.getImageData(0, 0, 200, 200);
+
+		var c = document.createElement('canvas');
+
+		c.setAttribute('id', '_temp_canvas');
+		c.width = 20;
+		c.height = 20;
+
+		c.getContext('2d').putImageData(data, 0, 0);
+		console.log(c.toDataURL());
+		fabric.Image.fromURL(c.toDataURL(), function(img) {
+			img.left = 50;
+			img.top = 50;
+			canvas2.add(img);
+			console.log(img.left);
+			img.bringToFront();
+			c = null;
+			$('#_temp_canvas').remove();
+			canvas2.renderAll();
+			
+		});
+	}
     </script>
     
 </head>
@@ -53,7 +188,12 @@
 						</label>
 						
 					</a></li>
-                    <li><a href="#">閉じる</a></li>
+					<li><a href="javascript:TestPixcel2('cnvs');">
+						<label>
+							画像をぼかす？？
+						</label>
+					</a></li>
+                    <li><a href="javascript:SizeChange('cnvs');">閉じる</a></li>
                     <li><a href="#">終了</a></li>
                   </ul>
                 </li>
@@ -89,29 +229,15 @@
 								</ul>
 								<!-- 写真部分 -->
 								<div class="tab-content">
-										<div id="photo1" class="tab-pane active"> <canvas id="cnvs" width="1990" height="500" style="border:1px solid #aaa"></canvas>
-												<script type="text/javascript">
-														$(function(){
-														                // 準備
-														                var canvas = new fabric.Canvas('cnvs');
-														                // 四角
-														                canvas.add(
-														                    new fabric.Rect({
-														                        width: 100,
-														                        height: 200,
-														                        left: 100,
-														                        top: 100,
-														                        fill: 'red',
-														                    }));
-														                });
-												</script>
-										</div>
+										<canvas id="cnvs" style="border:1px solid #aaa" class="img-fluid"></canvas>
+										<canvas id="tmp" style="border:1px solid #aaa" class="img-fluid"></canvas>
+												
 										<div id="photo2" class="tab-pane"> タブコントロールです。リポジトリチェック </div>
 										<div id="photo3" class="tab-pane"> こちらも変えてみます。 </div>
 										<div id="photo4" class="tab-pane"> ここには写真４が入ります。 </div>
 								</div>
 						</div>
-						<div class="col-sm-3"> ここに右サイドバーメニューを出します。 </div>
+						<div class="col-sm-3"> ここに右サイドバーメニューを出します。 <br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br></div>
 				</div>
 				<!-- 4個分のタブ -->
 		</main>
