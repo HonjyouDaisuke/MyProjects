@@ -20,6 +20,8 @@
 			position: absolute;
 			top: 0;
 			left: 0;
+			width: 100%;
+			overflow: auto;
 		}
 	</style>
   <script>
@@ -142,6 +144,9 @@
     }
     function onDown(event){
         mamDraw.isMouseDown=true;
+		var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
+		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
+		console.log("scale===" + scaleWidth + "," + scaleHeight);
         mamDraw.position.px=event.touches[0].pageX-event.target.getBoundingClientRect().left-mamGetScrollPosition().x;
         mamDraw.position.py=event.touches[0].pageY-event.target.getBoundingClientRect().top -mamGetScrollPosition().y;
         mamDraw.position.x=mamDraw.position.px;
@@ -174,8 +179,10 @@
         event.stopPropagation();
     }
     function onMouseDown(event){
-        mamDraw.position.px=event.clientX-event.target.getBoundingClientRect().left;
-        mamDraw.position.py=event.clientY-event.target.getBoundingClientRect().top ;
+        var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
+		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
+		mamDraw.position.px=(event.clientX-event.target.getBoundingClientRect().left)/scaleWidth;
+        mamDraw.position.py=(event.clientY-event.target.getBoundingClientRect().top)/scaleHeight;
         mamDraw.position.x=mamDraw.position.px;
         mamDraw.position.y=mamDraw.position.py;
         pointX.push(mamDraw.position.x);
@@ -186,9 +193,13 @@
     }
     function onMouseMove(event){
         if(mamDraw.isMouseDown){
-			mamDraw.position.x=event.clientX-event.target.getBoundingClientRect().left;
-			mamDraw.position.y=event.clientY-event.target.getBoundingClientRect().top ;
-			pointX.push(mamDraw.position.x);
+			var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
+			var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
+			mamDraw.position.px=(event.clientX-event.target.getBoundingClientRect().left)/scaleWidth;
+        	mamDraw.position.py=(event.clientY-event.target.getBoundingClientRect().top)/scaleHeight;
+        	mamDraw.position.x=mamDraw.position.px;
+        	mamDraw.position.y=mamDraw.position.py;
+        	pointX.push(mamDraw.position.x);
 			pointY.push(mamDraw.position.y);
 			drawLine();
 			mamDraw.position.px=mamDraw.position.x;
