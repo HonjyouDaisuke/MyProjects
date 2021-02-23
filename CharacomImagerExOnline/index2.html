@@ -183,11 +183,11 @@
 		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
 		mamDraw.position.px=(event.clientX-event.target.getBoundingClientRect().left)/scaleWidth;
         mamDraw.position.py=(event.clientY-event.target.getBoundingClientRect().top)/scaleHeight;
+        if(mamDraw.isMouseDown == true) drawLine();
         mamDraw.position.x=mamDraw.position.px;
         mamDraw.position.y=mamDraw.position.py;
         pointX.push(mamDraw.position.x);
 		pointY.push(mamDraw.position.y);
-        drawLine();
         mamDraw.isMouseDown=true;
         event.stopPropagation();
     }
@@ -197,11 +197,11 @@
 			var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
 			mamDraw.position.px=(event.clientX-event.target.getBoundingClientRect().left)/scaleWidth;
         	mamDraw.position.py=(event.clientY-event.target.getBoundingClientRect().top)/scaleHeight;
-        	mamDraw.position.x=mamDraw.position.px;
+        	drawLine();
+			mamDraw.position.x=mamDraw.position.px;
         	mamDraw.position.y=mamDraw.position.py;
         	pointX.push(mamDraw.position.x);
 			pointY.push(mamDraw.position.y);
-			drawLine();
 			mamDraw.position.px=mamDraw.position.x;
 			mamDraw.position.py=mamDraw.position.y;
 			event.stopPropagation();
@@ -216,8 +216,10 @@
         event.stopPropagation();
     }
     function drawLine(){
-        mamDraw.context.strokeStyle="#000000";
-        mamDraw.context.lineWidth=5;
+        var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
+		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
+		mamDraw.context.strokeStyle="#000000";
+        mamDraw.context.lineWidth=5 / scaleWidth;
         mamDraw.context.lineJoin="round";
         mamDraw.context.lineCap="round";
         mamDraw.context.beginPath();
