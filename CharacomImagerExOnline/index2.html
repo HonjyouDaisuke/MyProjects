@@ -55,6 +55,53 @@
 		alert(canvasName);
 	}
 
+	// Rectangle
+	function struct(func) {
+		return function() {
+			var f = new func();
+			func.apply(f, arguments); // (C)
+			return f;
+		}; // (B)
+	}
+
+	var Rect = struct(function Rect(x, y, width, height) {
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+	});
+
+	function getRectangle(){
+		var r = new Rect(0, 0, 0, 0);
+		max_x = 0;
+		min_x = 9999999;
+		max_y = 0;
+		min_y = 9999999;
+
+		for(i=0; i<pointX.length; i++){
+			if(pointX[i] > max_x) max_x = pointX[i];
+			if(pointX[i] < min_x) min_x = pointX[i];
+		}
+		for(i=0; i<pointX.length; i++){
+			if(pointY[i] > max_y) max_y = pointY[i];
+			if(pointY[i] < min_y) min_y = pointY[i];
+		}
+		r.x = min_x;
+		r.y = min_y;
+		r.width = max_x - min_x;
+		r.height = max_y - min_y;
+
+		return r;
+	}
+
+	function GetRactangleImage(originalCanvas, extractionCanvas, rect){
+		var ocContext = originalCanvas.getContext('2d');
+		var exContext = extractionCanvas.getContext('2d');
+		var ocImage = ocContext.getImageData(rect.x, rect.y, rect.width, rect.height);
+		var exImage = exContext.getImageData(rect.x, rect.y, rect.width, rect.height);
+
+		exContext.putImageData(ocImage, 10, 10);
+	}
 	function TestPixcel(canvasName){
 		var canvas = new fabric.Canvas(canvasName);
 		var canvas2 = new fabric.Canvas("tmp");
@@ -82,34 +129,7 @@
 		canvas2.add(fabricImage);
 		cc2.putImageData(ImageData, top, left);
 	}
-
-	function TestPixcel2(canvasName){
-		var canvas = new fabric.Canvas(canvasName);
-		var canvas2 = new fabric.Canvas("tmp");
-		var ctx = canvas.getContext('2d');
-		var data = ctx.getImageData(0, 0, 200, 200);
-
-		var c = document.createElement('canvas');
-
-		c.setAttribute('id', '_temp_canvas');
-		c.width = 20;
-		c.height = 20;
-
-		c.getContext('2d').putImageData(data, 0, 0);
-		console.log(c.toDataURL());
-		fabric.Image.fromURL(c.toDataURL(), function(img) {
-			img.left = 50;
-			img.top = 50;
-			canvas2.add(img);
-			console.log(img.left);
-			img.bringToFront();
-			c = null;
-			$('#_temp_canvas').remove();
-			canvas2.renderAll();
-			
-		});
-	}
-
+	
     var mamDraw=[];
     mamDraw.isMouseDown=false;
     mamDraw.position=[];
@@ -210,10 +230,13 @@
     function onMouseUp(event){
         mamDraw.isMouseDown=false;
 		fillPath();
+		var rect = getRectangle();
+		console.log(rect);
+        var canvas = document.getElementById('cnvs');
+		GetRactangleImage(canvas, mamDraw.canvas, rect);
 		pointX = [];
 		pointY = [];
-
-        event.stopPropagation();
+		event.stopPropagation();
     }
     function drawLine(){
         var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
