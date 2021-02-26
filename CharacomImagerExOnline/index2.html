@@ -97,37 +97,129 @@
 	function GetRactangleImage(originalCanvas, extractionCanvas, rect){
 		var ocContext = originalCanvas.getContext('2d');
 		var exContext = extractionCanvas.getContext('2d');
+		var moContext = originalCanvas.getContext('2d');
 		var ocImage = ocContext.getImageData(rect.x, rect.y, rect.width, rect.height);
 		var exImage = exContext.getImageData(rect.x, rect.y, rect.width, rect.height);
-
-		exContext.putImageData(ocImage, 10, 10);
+		var moImage = moContext.getImageData(rect.x, rect.y, rect.width, rect.height);
+		
+		//CompRectImage(ocImage, exImage, moImage, ocImage.width, ocImage.height);
+		BinarizationImage(ocImage);
+		var canvas_tmp = document.getElementById("chara"); 
+        var ctx_tmp = canvas_tmp.getContext('2d');
+		canvas_tmp.height = ocImage.height;
+		canvas_tmp.width = ocImage.width;  
+		ctx_tmp.putImageData(ocImage, 0, 0);       
+		//exContext.putImageData(ocImage, 10, 10);
 	}
-	function TestPixcel(canvasName){
-		var canvas = new fabric.Canvas(canvasName);
-		var canvas2 = new fabric.Canvas("tmp");
-		var cc = canvas.getContext('2d');
-		var cc2 = canvas2.getContext('2d');
 
-		var top = 0;
-		var left = 0;
-		var width = 255;
-		var height = 255;
-		var ImageData = cc.getImageData(top, left, width, height);
-		var data = ImageData;
-		for (var x = 0; x < width; ++x) {
-			for (var y = 0; y < height; ++y) {
-				// 対象pixelのindex（色情報があるので*4する） 
-				var index = (x + y * width) * 4;
-				data[index + 0] = x;
-				data[index + 1] = y;
-				data[index + 2] = (x + y) / 255;
-				data[index + 3] = 255;
-			};
-		};
-		ImageData.data = data;
-		var fabricImage = new fabric.Image(ImageData);
-		canvas2.add(fabricImage);
-		cc2.putImageData(ImageData, top, left);
+	//2値化処理
+	function BinarizationImage(ImageData){
+		//モノクロ変換
+		for( i=0; i<ImageData.height; i++){
+			for(j=0; j<ImageData.width; j++){
+				var index = (j + i * ImageData.width) * 4;
+				var R = ImageData.data[index + 0];
+				var G = ImageData.data[index + 1];
+				var B = ImageData.data[index + 2];
+				var A = ImageData.data[index + 3];
+
+				ImageData.data[index + 0] = 0.30*R + 0.59*G + 0.11*B;
+				ImageData.data[index + 1] = 0.30*R + 0.59*G + 0.11*B;
+				ImageData.data[index + 2] = 0.30*R + 0.59*G + 0.11*B;
+			}
+		}
+
+		//判別分析
+		var sb2_max = 0;
+		for (t_num = 0; t_num < 256; t_num++){
+			var sb2 = 0.0;
+			var w0 = 0.0;
+			var w1 = 0.0;
+			var m0 = 0.0;
+			var m1 = 0.0;
+			var class0 = 0;
+			var class1 = 0;
+			var sum0 = 0;
+			var sum1 = 0;
+			var ave0 = 0;
+			var ave1 = 0;
+			for( i = 0; i < ImageData.height; i ++){
+				for( j = 0; j < ImageData.width; j ++){
+					var index = (j + i * ImageData.width) * 4;
+					if(ImageData.data[index + 0] < t_num){
+						sum0 += ImageData.data[index + 0];
+						class0 ++;
+					}else{
+						sum1 += ImageData.data[index + 0];
+						class1 ++;
+					}
+				}
+			}
+			w0 = class0/(ImageData.width * ImageData.height);
+			w1 = class1/(ImageData.width * ImageData.height);
+			if(class0 == 0){
+				m0 = 0;
+			}else{
+				m0 = sum0/class0;
+			}
+			if(class1 == 0){
+				m1 = 0;
+			}else{
+				m1 = sum1/class1;
+			}
+			sb2 = w0 * w1 * (m0 - m1) * (m0 - m1);
+			if(sb2 > sb2_max){
+				sb2_max = sb2;
+				t = t_num;
+			}
+		}
+
+		for( i=0; i<ImageData.height; i++){
+			for(j=0; j<ImageData.width; j++){
+				var index = (j + i * ImageData.width) * 4;
+				var R = ImageData.data[index + 0];
+				var a;
+				if(R < t){
+					a = 0;
+				}else{
+					a = 255;
+				}
+				ImageData.data[index + 0] = a;
+				ImageData.data[index + 1] = a;
+				ImageData.data[index + 2] = a;
+			}
+		}
+		 　
+	}
+	
+	//矩形、モノクロ画像を作り、文字を抽出
+	function CompRectImage(ocImage, exImage, moImage, width, height){
+		var outImage = new ImageData(width, height);
+
+		for( i=0; i<ocImage.height; i++){
+			for(j=0; j<ocImage.width; j++){
+				var index = (j + i * width) * 4;
+				var ocR = ocImage.data[index + 0];
+				var ocG = ocImage.data[index + 1];
+				var ocB = ocImage.data[index + 2];
+				var ocA = ocImage.data[index + 3];
+				var exR = exImage.data[index + 0];
+				var exG = exImage.data[index + 1];
+				var exB = exImage.data[index + 2];
+				
+				if(exB > 250){
+					outImage.data[index + 0] = ocR;
+					outImage.data[index + 1] = ocG;
+					outImage.data[index + 2] = ocB;
+					outImage.data[index + 3] = ocA;
+				}
+			}
+		}
+		//var canvas_tmp = document.getElementById("chara"); 
+        //var ctx_tmp = canvas_tmp.getContext('2d');
+		//ctx_tmp.putImageData(outImage, 0, 0);       
+		//canvas_tmp.height = outImage.height;
+		//canvas_tmp.width = outImage.width;   　
 	}
 	
     var mamDraw=[];
@@ -344,7 +436,7 @@
 										<div id="photo4" class="tab-pane"> ここには写真４が入ります。 </div>
 								</div>
 						</div>
-						<div class="col-sm-3"> ここに右サイドバーメニューを出します。 <br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br></div>
+						<div class="col-sm-3"> <canvas id="chara" style="border:1px solid #aaa" class="img-fluid"></canvas>ここに右サイドバーメニューを出します。 <br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br></div>
 				</div>
 				<!-- 4個分のタブ -->
 		</main>
