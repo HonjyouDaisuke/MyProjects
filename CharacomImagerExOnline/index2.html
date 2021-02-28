@@ -102,13 +102,14 @@
 		var exImage = exContext.getImageData(rect.x, rect.y, rect.width, rect.height);
 		var moImage = moContext.getImageData(rect.x, rect.y, rect.width, rect.height);
 		
-		//CompRectImage(ocImage, exImage, moImage, ocImage.width, ocImage.height);
-		BinarizationImage(ocImage);
-		var canvas_tmp = document.getElementById("chara"); 
-        var ctx_tmp = canvas_tmp.getContext('2d');
-		canvas_tmp.height = ocImage.height;
-		canvas_tmp.width = ocImage.width;  
-		ctx_tmp.putImageData(ocImage, 0, 0);       
+		
+		BinarizationImage(moImage);
+		CompRectImage(ocImage, exImage, moImage, ocImage.width, ocImage.height);
+		//var canvas_tmp = document.getElementById("chara"); 
+        //var ctx_tmp = canvas_tmp.getContext('2d');
+		//canvas_tmp.height = moImage.height;
+		//canvas_tmp.width = moImage.width;  
+		//ctx_tmp.putImageData(moImage, 0, 0);       
 		//exContext.putImageData(ocImage, 10, 10);
 	}
 
@@ -206,8 +207,9 @@
 				var exR = exImage.data[index + 0];
 				var exG = exImage.data[index + 1];
 				var exB = exImage.data[index + 2];
-				
-				if(exB > 250){
+				var moB = moImage.data[index + 0];
+
+				if(exB > 250 && moB == 0){
 					outImage.data[index + 0] = ocR;
 					outImage.data[index + 1] = ocG;
 					outImage.data[index + 2] = ocB;
@@ -215,11 +217,12 @@
 				}
 			}
 		}
-		//var canvas_tmp = document.getElementById("chara"); 
-        //var ctx_tmp = canvas_tmp.getContext('2d');
-		//ctx_tmp.putImageData(outImage, 0, 0);       
-		//canvas_tmp.height = outImage.height;
-		//canvas_tmp.width = outImage.width;   　
+		var canvas_tmp = document.getElementById("chara"); 
+        var ctx_tmp = canvas_tmp.getContext('2d');
+		canvas_tmp.height = outImage.height;
+		canvas_tmp.width = outImage.width;
+		ctx_tmp.putImageData(outImage, 0, 0);       
+		   　
 	}
 	
     var mamDraw=[];
