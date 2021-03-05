@@ -28,6 +28,7 @@
     function LoadImageFile(files, canvasName) {        　
         var canvas = document.getElementById(canvasName);
 		var canvas_tmp = document.getElementById("tmp"); 
+		var canvas_Rect = document.getElementById("ex_rect");
         var ctx = canvas.getContext('2d');          　
         var reader = new FileReader();              
         reader.onload = function(event) {           
@@ -36,7 +37,9 @@
                 canvas.width = img.naturalWidth;
 				canvas.height = img.naturalHeight; 
 				canvas_tmp.width = img.naturalWidth;
-				canvas_tmp.height = img.naturalHeight
+				canvas_tmp.height = img.naturalHeight;
+				canvas_Rect.width = img.naturalWidth;
+				canvas_Rect.height = img.naturalHeight;
                 //canvas.style.width = canvas.width + "px";
 				//canvas.style.height = canvas.height + "px";    
 				ctx.drawImage(img, 0, 0); 
@@ -94,17 +97,19 @@
 		return r;
 	}
 
-	function GetRactangleImage(originalCanvas, extractionCanvas, rect){
+	function GetRactangleImage(originalCanvas, extractionCanvas, rectCanvas,rect){
 		var ocContext = originalCanvas.getContext('2d');
 		var exContext = extractionCanvas.getContext('2d');
 		var moContext = originalCanvas.getContext('2d');
+		var reContext = rectCanvas.getContext('2d');
 		var ocImage = ocContext.getImageData(rect.x, rect.y, rect.width, rect.height);
 		var exImage = exContext.getImageData(rect.x, rect.y, rect.width, rect.height);
 		var moImage = moContext.getImageData(rect.x, rect.y, rect.width, rect.height);
 		
-		
 		BinarizationImage(moImage);
 		CompRectImage(ocImage, exImage, moImage, ocImage.width, ocImage.height);
+		drawRect(rectCanvas, reContext, rect);
+		clearCanvas(extractionCanvas);
 		//var canvas_tmp = document.getElementById("chara"); 
         //var ctx_tmp = canvas_tmp.getContext('2d');
 		//canvas_tmp.height = moImage.height;
@@ -328,7 +333,8 @@
 		var rect = getRectangle();
 		console.log(rect);
         var canvas = document.getElementById('cnvs');
-		GetRactangleImage(canvas, mamDraw.canvas, rect);
+		var rect_canvas = document.getElementById('ex_rect');
+		GetRactangleImage(canvas, mamDraw.canvas, rect_canvas, rect);
 		pointX = [];
 		pointY = [];
 		event.stopPropagation();
@@ -337,7 +343,8 @@
         var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
 		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
 		mamDraw.context.strokeStyle="#000000";
-        mamDraw.context.lineWidth=5 / scaleWidth;
+		mamDraw.context.setLineDash([2, 2]);
+        mamDraw.context.lineWidth=2 / scaleWidth;
         mamDraw.context.lineJoin="round";
         mamDraw.context.lineCap="round";
         mamDraw.context.beginPath();
@@ -345,6 +352,29 @@
         mamDraw.context.lineTo(mamDraw.position.x,mamDraw.position.y);
         mamDraw.context.stroke();
     }
+
+	function drawRect(rectCanvas, rectContext, rect){
+        var scaleWidth = rectCanvas.clientWidth / rectCanvas.width;
+		var scaleHeight = rectCanvas.clientHeight/ rectCanvas.height;
+		rectContext.strokeStyle="red";
+		rectContext.setLineDash([5 / scaleWidth, 5 / scaleWidth]);
+        rectContext.lineWidth=2 / scaleWidth;
+        rectContext.lineJoin="round";
+        rectContext.lineCap="round";
+        rectContext.beginPath();
+        
+		rectContext.rect(rect.x, rect.y, rect.width, rect.height);
+
+		rectContext.stroke();
+		console.log("aaaa");
+    }
+
+	function clearCanvas(canvas)
+	{
+		var ctx = canvas.getContext("2d");
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
+
 	function fillPath(){
 		mamDraw.context.beginPath();
 		mamDraw.context.moveTo(pointX[0], pointY[0]);
@@ -355,6 +385,7 @@
 		mamDraw.context.fillStyle = 'rgb(0, 0, 255)';
 		mamDraw.context.fill();
 	}
+	/***
     function clearCanvas(){
         //mamDraw.context.fillStyle="rgb(255,255,255)";
         mamDraw.context.clearRect(
@@ -363,6 +394,7 @@
 			mamDraw.canvas.getBoundingClientRect().height
         );
     }
+	***/
     function mamGetScrollPosition() {
         return {
         "x":document.documentElement.scrollLeft || document.body.scrollLeft,
@@ -431,7 +463,9 @@
 								<div class="tab-content">
 									<div class="canvas-wrapper">
 										<canvas id="cnvs" style="border:1px solid #aaa" class="img-fluid"></canvas>
+										<canvas id="ex_rect" style="border:1px solid #aaa" class="img-fluid"></canvas>
 										<canvas id="tmp" style="border:1px solid #aaa" class="img-fluid"></canvas>
+										
 									</div>	
 												
 										<div id="photo2" class="tab-pane"> タブコントロールです。リポジトリチェック </div>
