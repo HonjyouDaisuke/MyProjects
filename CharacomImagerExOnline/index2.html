@@ -362,6 +362,10 @@
 		var strCanvasID = "new_canvas" + SideBarNum.toString();
 		new_canvas.id = strCanvasID;
 		new_canvas.style.width = "100%";
+		new_canvas.style.border = "1px";
+		new_canvas.style.solid = "#aaa";
+
+		// <canvas id="chara" style="border:1px solid #aaa" class="img-fluid"></canvas>
 		var side_bar = document.getElementById('rightSide');
 		side_bar.appendChild(new_canvas);
 		SideBarNum++;
@@ -489,9 +493,7 @@
 								</div>
 						</div>
 						<div id='rightSide' class="col-sm-3">
-							<canvas id="chara" style="border:1px solid #aaa" class="img-fluid"></canvas>
-							<br>
-							ここに右サイドバーメニューを出します。 <br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>たくさん書きます<br>
+							
 						</div>
 				</div>
 				<!-- 4個分のタブ -->
