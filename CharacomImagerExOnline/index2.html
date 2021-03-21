@@ -25,13 +25,21 @@
 		}
 	</style>
   <script>
-    function LoadImageFile(files, canvasName) {        　
+	function activeTab( tabid ){
+		$('.nav-tabs a[href="#' + tabid + '"]').tab( 'show' );
+	}
+
+    function LoadImageFile(files, canvasName, ptabID, tabID, tabPaneID) {        　
         var canvas = document.getElementById(canvasName);
 		var canvas_tmp = document.getElementById("tmp"); 
 		var canvas_Rect = document.getElementById("ex_rect");
-        var ctx = canvas.getContext('2d');          　
+        var tab = document.getElementById(tabID);
+        var ptab = document.getElementById(ptabID);
+		var tabpane = document.getElementById(tabPaneID);
+		var ctx = canvas.getContext('2d');          　
         var reader = new FileReader();              
-        reader.onload = function(event) {           
+        reader.onload = function(event) {
+			tab.textContent = files[0].name;           
             var img = new Image();                 
             img.onload = function() {              
                 canvas.width = img.naturalWidth;
@@ -44,11 +52,19 @@
 				//canvas.style.height = canvas.height + "px";    
 				ctx.drawImage(img, 0, 0); 
 				console.log(canvas.style.width + "," + canvas.style.height + ":" + canvas.width + "," + canvas.height);
+				
             }                                     　
             img.src = event.target.result;  
-            canvas.isDrawingMode = true;　      　
+            canvas.isDrawingMode = true;
+			     　
         }                                           
-        reader.readAsDataURL(files[0]);             　　
+        reader.readAsDataURL(files[0]);
+		console.log('.nav-tabs a[href="#' + ptabID + '"]');
+		activeTab(ptabID);
+		ptab.className = "nav-item active";
+		tabpane.className = "tab-pane active";
+		jQuery('#' + tabID).attr('aria-expanded', true);
+		//tab.attributes('aria-expanded') = "true";
     }
 
 	function SizeChange(canvasName){
@@ -445,7 +461,7 @@
                     <li><a href="javascript:LoadImageFile('cnvs');">
 						<label>
 							画像を読み込む
-							<input type="file" id="file" style="display: none;" onchange="LoadImageFile(this.files, 'cnvs')">
+							<input type="file" id="file" style="display: none;" onchange="LoadImageFile(this.files, 'cnvs', 'pTab1', 'tab1', 'photo1')">
 						</label>
 						
 					</a></li>
@@ -483,23 +499,23 @@
 						</nav>
 						<div class="col-sm-8">
 								<ul class="nav nav-tabs nav-inverse">
-										<li class="nav-item"> <a href="#photo1" class="nav-link active" data-toggle="tab">タブ１</a> </li>
+										<li id="pTab1" class="nav-item"> <a id="tab1" href="#photo1" class="nav-link active" data-toggle="tab">タブ１</a> </li>
 										<li class="nav-item"> <a href="#photo2" class="nav-link" data-toggle="tab">タブ2</a> </li>
 										<li class="nav-item"> <a href="#photo3" class="nav-link" data-toggle="tab">タブ3</a> </li>
 										<li class="nav-item"> <a href="#photo4" class="nav-link" data-toggle="tab">タブ4</a> </li>
 								</ul>
 								<!-- 写真部分 -->
 								<div class="tab-content">
-									<div class="canvas-wrapper">
-										<canvas id="cnvs" style="border:1px solid #aaa" class="img-fluid"></canvas>
-										<canvas id="ex_rect" style="border:1px solid #aaa" class="img-fluid"></canvas>
-										<canvas id="tmp" style="border:1px solid #aaa" class="img-fluid"></canvas>
-										
-									</div>	
-												
-										<div id="photo2" class="tab-pane"> タブコントロールです。リポジトリチェック </div>
-										<div id="photo3" class="tab-pane"> こちらも変えてみます。 </div>
-										<div id="photo4" class="tab-pane"> ここには写真４が入ります。 </div>
+									<div id="photo1" class="tab-pane">
+										<div class="canvas-wrapper">
+											<canvas id="cnvs" style="border:1px solid #aaa" class="img-fluid"></canvas>
+											<canvas id="ex_rect" style="border:1px solid #aaa" class="img-fluid"></canvas>
+											<canvas id="tmp" style="border:1px solid #aaa" class="img-fluid"></canvas>
+										</div>	
+									</div>			
+									<div id="photo2" class="tab-pane"> タブコントロールです。リポジトリチェック </div>
+									<div id="photo3" class="tab-pane"> こちらも変えてみます。 </div>
+									<div id="photo4" class="tab-pane"> ここには写真４が入ります。 </div>
 								</div>	
 						</div>
 						<div id='rightSide' class="col-sm-3">
