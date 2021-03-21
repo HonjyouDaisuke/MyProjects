@@ -247,9 +247,9 @@
     window.addEventListener("load",function(){
         //初期設定
         mamDraw.canvas=document.getElementById("tmp");
-        mamDraw.canvas.addEventListener("touchstart",onMouseDown);
-        mamDraw.canvas.addEventListener("touchmove",onMouseMove);
-        mamDraw.canvas.addEventListener("touchend",onMouseUp);
+        mamDraw.canvas.addEventListener("touchstart",onDown);
+        mamDraw.canvas.addEventListener("touchmove",onMove);
+        mamDraw.canvas.addEventListener("touchend",onUp);
         mamDraw.canvas.addEventListener("mousedown",onMouseDown);
         mamDraw.canvas.addEventListener("mousemove",onMouseMove);
         mamDraw.canvas.addEventListener("mouseup",onMouseUp);
@@ -265,43 +265,22 @@
         mamDraw.isMouseDown=false;
         event.stopPropagation();
     }
+
     function onDown(event){
-        mamDraw.isMouseDown=true;
-		var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
+        var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
 		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
-		console.log("scale===" + scaleWidth + "," + scaleHeight);
-        mamDraw.position.px=event.touches[0].pageX-event.target.getBoundingClientRect().left-mamGetScrollPosition().x;
-        mamDraw.position.py=event.touches[0].pageY-event.target.getBoundingClientRect().top -mamGetScrollPosition().y;
+		mamDraw.position.px=(event.touches[0].pageX-event.target.getBoundingClientRect().left-mamGetScrollPosition().x)/scaleWidth;
+        mamDraw.position.py=(event.touches[0].pageY-event.target.getBoundingClientRect().top -mamGetScrollPosition().y)/scaleHeight;
+        if(mamDraw.isMouseDown == true) drawLine();
         mamDraw.position.x=mamDraw.position.px;
         mamDraw.position.y=mamDraw.position.py;
 		pointX.push(mamDraw.position.x);
 		pointY.push(mamDraw.position.y);
-        drawLine();
-        event.preventDefault();
+        mamDraw.isMouseDown=true;
+		event.preventDefault();
         event.stopPropagation();
     }
-    function onMove(event){
-        if(mamDraw.isMouseDown){
-			mamDraw.position.x=event.touches[0].pageX-event.target.getBoundingClientRect().left-mamGetScrollPosition().x;
-			mamDraw.position.y=event.touches[0].pageY-event.target.getBoundingClientRect().top -mamGetScrollPosition().y;
-			drawLine();
-			mamDraw.position.px=mamDraw.position.x;
-			mamDraw.position.py=mamDraw.position.y;
-			pointX.push(mamDraw.position.x);
-			pointY.push(mamDraw.position.y);
-        
-			event.stopPropagation();
-        }
-    }
-    function onUp(event){
-        mamDraw.isMouseDown=false;
-        fillPath();
-		pointX = [];
-		pointY = [];
-
-        event.stopPropagation();
-    }
-    function onMouseDown(event){
+	function onMouseDown(event){
         var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
 		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
 		mamDraw.position.px=(event.clientX-event.target.getBoundingClientRect().left)/scaleWidth;
@@ -314,7 +293,24 @@
         mamDraw.isMouseDown=true;
         event.stopPropagation();
     }
-    function onMouseMove(event){
+
+    function onMove(event){
+        if(mamDraw.isMouseDown){
+			var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
+			var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
+			mamDraw.position.px=(event.touches[0].pageX-event.target.getBoundingClientRect().left-mamGetScrollPosition().x)/scaleWidth;
+        	mamDraw.position.py=(event.touches[0].pageY-event.target.getBoundingClientRect().top -mamGetScrollPosition().y)/scaleHeight;
+        	drawLine();
+			mamDraw.position.x=mamDraw.position.px;
+        	mamDraw.position.y=mamDraw.position.py;
+        	pointX.push(mamDraw.position.x);
+			pointY.push(mamDraw.position.y);
+			mamDraw.position.px=mamDraw.position.x;
+			mamDraw.position.py=mamDraw.position.y;
+			event.stopPropagation();
+        }
+    }
+	function onMouseMove(event){
         if(mamDraw.isMouseDown){
 			var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
 			var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
@@ -330,6 +326,20 @@
 			event.stopPropagation();
         }
     }
+    function onUp(event){
+        mamDraw.isMouseDown=false;
+		fillPath();
+		var rect = getRectangle();
+		console.log(rect);
+        var canvas = document.getElementById('cnvs');
+		var rect_canvas = document.getElementById('ex_rect');
+		GetRactangleImage(canvas, mamDraw.canvas, rect_canvas, rect);
+		pointX = [];
+		pointY = [];
+		event.stopPropagation();
+    }
+    
+    
     function onMouseUp(event){
         mamDraw.isMouseDown=false;
 		fillPath();
