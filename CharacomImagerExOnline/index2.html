@@ -247,9 +247,9 @@
     window.addEventListener("load",function(){
         //初期設定
         mamDraw.canvas=document.getElementById("tmp");
-        mamDraw.canvas.addEventListener("touchstart",onDown);
-        mamDraw.canvas.addEventListener("touchmove",onMove);
-        mamDraw.canvas.addEventListener("touchend",onUp);
+        mamDraw.canvas.addEventListener("touchstart",onMouseDown);
+        mamDraw.canvas.addEventListener("touchmove",onMouseMove);
+        mamDraw.canvas.addEventListener("touchend",onMouseUp);
         mamDraw.canvas.addEventListener("mousedown",onMouseDown);
         mamDraw.canvas.addEventListener("mousemove",onMouseMove);
         mamDraw.canvas.addEventListener("mouseup",onMouseUp);
