@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 	<meta charset="utf-8" />
-	<title>サンプル</title>
+	<title>CharacomImager Ex Online</title>
 	<!-- Bootstrap用CSSの読み込み -->
 	<!-- Bootstrap用JavaScriptの読み込み -->
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -11,7 +11,6 @@
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.1/fabric.min.js" integrity="sha512-ACqMrfAtm537AWzgx/xQ57JnFxXeq8RylQMGg4y/e6M2ew4Z8NycE8aId/Bt2ZE+w1gNsox3MgwxKl7SGMRdtA==" crossorigin="anonymous"></script>
 	<style>
 		.canvas-wrapper{
 			position: relative;
@@ -382,6 +381,71 @@
         mamDraw.context.stroke();
     }
 
+	function AddTab(targetID)
+	{
+		var ul = document.getElementById("tab-root");
+		var li = document.createElement('li');
+
+		// テキスト情報を作成
+		var anchor = document.createElement("a");
+		anchor.href = '#photo_' + targetID;
+		anchor.className = 'nav-link';
+		anchor.setAttribute('data-toggle', 'tab');
+		anchor.textContent = targetID + ' ';
+		// close button
+		var span = document.createElement("span");
+		span.className = 'close';
+		span.textContent = '×';
+		anchor.appendChild(span);
+
+		// ul要素に追加
+		li.appendChild(anchor);
+		li.className = "nav-item";
+		ul.appendChild(li);
+
+		// add tab page
+		var tabpage_root = document.getElementById('tabpage-root');
+		var tabpage = document.createElement("div");
+		tabpage.className = "tab-pane";
+		tabpage.id = "photo_" + targetID;
+		
+		// add canvas
+		var new_canvas = document.createElement("canvas");
+		new_canvas.id = "new";
+		new_canvas.style = "border:1px solid #aaa";
+		new_canvas.class = "img-fluid";
+
+		// canvas copy to new_canvas
+		var src_canvas = document.getElementById(targetID);
+		var src_ctx = src_canvas.getContext('2d');
+		var new_ctx = new_canvas.getContext('2d');
+		new_canvas.width = src_canvas.width;
+		new_canvas.height = src_canvas.height;
+		var img = src_ctx.getImageData(0, 0, src_canvas.width, src_canvas.height);
+		new_ctx.putImageData(img, 0, 0);  　
+        
+		tabpage.appendChild(new_canvas);
+		//						<div id="tabpage-root" class="tab-content">
+		//							<div id="photo1" class="tab-pane">
+		//								<div class="canvas-wrapper">
+		//									<canvas id="cnvs" style="border:1px solid #aaa" class="img-fluid"></canvas>
+		//									<canvas id="ex_rect" style="border:1px solid #aaa" class="img-fluid"></canvas>
+		//									<canvas id="tmp" style="border:1px solid #aaa" class="img-fluid"></canvas>
+		//								</div>	
+		//							</div>			
+		//							<div id="photo2" class="tab-pane"> タブコントロールです。リポジトリチェック </div>
+		//							<div id="photo3" class="tab-pane"> こちらも変えてみます。 </div>
+		//							<div id="photo4" class="tab-pane"> ここには写真４が入ります。 </div>
+		//						</div>
+
+
+		tabpage_root.appendChild(tabpage);
+	}
+	function SideBarDblClick(e){
+		console.log(e.target.id);
+		//add tabs
+		AddTab(e.target.id);
+	}
 	// Create Canvas
 	function CreateCanvas(){
 		var new_canvas = document.createElement('canvas');
@@ -390,7 +454,7 @@
 		new_canvas.style.width = "100%";
 		new_canvas.style.border = "1px";
 		new_canvas.style.solid = "#aaa";
-
+		new_canvas.addEventListener('dblclick', SideBarDblClick, false);
 		// <canvas id="chara" style="border:1px solid #aaa" class="img-fluid"></canvas>
 		var side_bar = document.getElementById('rightSide');
 		side_bar.appendChild(new_canvas);
@@ -453,7 +517,7 @@
   <!-- メインメニュー -->
 		<nav class="navbar">
 				<div class="container-fluid">
-						<div class="navbar-header"> <a class="navbar-brand" href="#">Bootstrap3 チュートリアル</a> </div>
+						<div class="navbar-header"> <a class="navbar-brand" href="#">Characom Ex Online</a> </div>
 						<ul class="nav navbar-nav">
 								<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">ファイル<span class="caret"></span></a>
                 	<ul class="dropdown-menu">
@@ -498,24 +562,28 @@
 								</ul>
 						</nav>
 						<div class="col-sm-8">
-								<ul class="nav nav-tabs nav-inverse">
-										<li id="pTab1" class="nav-item"> <a id="tab1" href="#photo1" class="nav-link active" data-toggle="tab">タブ１</a> </li>
-										<li class="nav-item"> <a href="#photo2" class="nav-link" data-toggle="tab">タブ2</a> </li>
-										<li class="nav-item"> <a href="#photo3" class="nav-link" data-toggle="tab">タブ3</a> </li>
-										<li class="nav-item"> <a href="#photo4" class="nav-link" data-toggle="tab">タブ4</a> </li>
+								<ul id="tab-root" class="nav nav-tabs nav-inverse">
+										<li id="pTab1" class="nav-item"> <a id="tab1" href="#photo1" class="nav-link active" data-toggle="tab">タブ1 &nbsp;<span class="close">×</span></a> </li>
+								<!--
+										<li class="nav-item"> <a href="#photo2" class="nav-link" data-toggle="tab">タブ2 &nbsp;<span class="close">×</span></a> </li>
+										<li class="nav-item"> <a href="#photo3" class="nav-link" data-toggle="tab">タブ3 &nbsp;<span class="close">×</span></a> </li>
+										<li class="nav-item"> <a href="#photo4" class="nav-link" data-toggle="tab">タブ4 &nbsp;<span class="close">×</span></a> </li>
+								-->
 								</ul>
 								<!-- 写真部分 -->
-								<div class="tab-content">
+								<div id="tabpage-root" class="tab-content">
 									<div id="photo1" class="tab-pane">
 										<div class="canvas-wrapper">
 											<canvas id="cnvs" style="border:1px solid #aaa" class="img-fluid"></canvas>
 											<canvas id="ex_rect" style="border:1px solid #aaa" class="img-fluid"></canvas>
 											<canvas id="tmp" style="border:1px solid #aaa" class="img-fluid"></canvas>
 										</div>	
-									</div>			
+									</div>
+									<!--			
 									<div id="photo2" class="tab-pane"> タブコントロールです。リポジトリチェック </div>
 									<div id="photo3" class="tab-pane"> こちらも変えてみます。 </div>
 									<div id="photo4" class="tab-pane"> ここには写真４が入ります。 </div>
+									-->
 								</div>	
 						</div>
 						<div id='rightSide' class="col-sm-3">
