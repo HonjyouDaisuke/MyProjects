@@ -73,7 +73,7 @@
 		node.icon = "bi bi-images";
 		//node.nodes = [];
 		ProjectTree[0].nodes.push(node);
-		UpdateTree();
+		$('#tree').change();
 		//console.log(node);
 		//var targetTab = document.getElementById(tabID);
 		//targetTab.tab('show');
@@ -141,6 +141,7 @@
 			data: www_test_tree
 		});
 		
+		$('#tree').change();
 		//$('#tree').treeview('enableAll', true);
 		//$('#tree').treeview(true);
 		//console.log(test2_tree);
@@ -581,20 +582,19 @@
 		node.text = strCanvasID;
 		node.icon = "bi bi-image";
 
-		var charaNode1 = {};
-		charaNode1.text = "myChara1";
-		charaNode1.icon = "bi bi-image";
+		//var charaNode1 = {};
+		//charaNode1.text = "myChara1";
+		//charaNode1.icon = "bi bi-image";
 
-		var charaNode2 = {};
-		charaNode2.text = "myChara2";
-		charaNode2.icon = "bi bi-image";
+		//var charaNode2 = {};
+		//charaNode2.text = "myChara2";
+		//charaNode2.icon = "bi bi-image";
 
-		//ProjectTree[0].nodes[0].nodes.push(node);
-		ProjectTree[0].nodes[0].nodes.push(charaNode1);
-		ProjectTree[0].nodes[0].nodes.push(charaNode2);
+		ProjectTree[0].nodes[0].nodes.push(node);
+		//ProjectTree[0].nodes[0].nodes.push(charaNode1);
+		//ProjectTree[0].nodes[0].nodes.push(charaNode2);
 
-		UpdateTree();
-		
+		$('#tree').change();
 		return(strCanvasID);
 	}
 
@@ -653,7 +653,7 @@
 		pronode.text = "tab_from menu";
 		pronode.icon = "bi bi-images";
 		ProjectTree.push(pronode);
-		UpdateTree();
+		$('#tree').change();
 		/***
 		$('#tree').treeview({
 			color: "#428bca",
@@ -741,17 +741,11 @@
 		<div class="col-7">
 			<!-- <ul id="tab-root" class="nav nav-tabs nav-inverse"> -->
 			<div class="nav nav-tabs" id="tab-root" role="tablist">
-				<a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Home</a>
-				<a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</a>
-				<a class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</a>
 				<a class="nav-link" id="tab1" data-bs-toggle="tab" href="#photo1" role="tab" aria-controls="photo1" aria-selected="false">tab1</a>
 			</div>
 			
 			<!-- パネル部分 -->
 			<div id="tabpage-root" class="tab-content">
-				<div id="nav-home" class="tab-pane active" role="tabpanel" aria-labelledby="home-tab">タブパネルのプレースホルダーコンテンツ。...</div>
-				<div id="nav-profile" class="tab-pane" role="tabpanel" aria-labelledby="profile-tab">タブパネルのプレースホルダーコンテンツ。...</div>
-				<div id="nav-contact" class="tab-pane" role="tabpanel" aria-labelledby="contact-tab">タブパネルのプレースホルダーコンテンツ。...</div>
 				<div id="photo1" class="tab-pane">
 					<div class="canvas-wrapper">
 						<canvas id="cnvs" style="border:1px solid #aaa" class="img-fluid"></canvas>
@@ -800,19 +794,18 @@
 	</main>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 	<script>
-		
-		$('#tree').treeview({
-          color: "#428bca",
-		  levels: 5,
-          expandIcon: 'bi bi-caret-right-fill',
-          collapseIcon: 'bi bi-caret-down-fill',
-          nodeIcon: 'bi bi-folder2-open',
-		  showBorder: false,
-          data: ProjectTree
-        });
-		
-		
-		UpdateTree();
+		$('#tree').change(function(){
+			$('#tree').treeview({
+          		color: "#428bca",
+				levels: 5,
+				expandIcon: 'bi bi-caret-right-fill',
+				collapseIcon: 'bi bi-caret-down-fill',
+				nodeIcon: 'bi bi-folder2-open',
+				showBorder: false,
+				data: ProjectTree
+        	});
+		});
+		$('#tree').change();
     	
 	</script>
 </body>
