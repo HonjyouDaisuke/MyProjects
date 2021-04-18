@@ -13,6 +13,10 @@
 	<link rel="stylesheet" href="css/bootstrap-treeview.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 	<script src='js/bootstrap-treeview.js'></script>
+	<script src='js/image-effect.js'></script>
+	<script src='js/main-tab.js'></script>
+	<script src='js/main-treeview.js'></script>
+	<script src='js/main.js'></script>
 	<!--
 	<script src="https://kit.fontawesome.com/a3cb7c4067.js" crossorigin="anonymous"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -29,62 +33,17 @@
 			width: 100%;
 			overflow: auto;
 		}
+
+		.rightSideTanel{
+			height: 100%;
+		}
 	</style>
   <script>
 	function activeTab( tabid ){
 		$('.nav-tabs a[href="#' + tabid + '"]').tab( 'show' );
 	}
 
-    function LoadImageFile(files, canvasName, ptabID, tabID, tabPaneID) {        　
-        var canvas = document.getElementById(canvasName);
-		var canvas_tmp = document.getElementById("tmp"); 
-		var canvas_Rect = document.getElementById("ex_rect");
-        var tab = document.getElementById(tabID);
-        var ptab = document.getElementById(ptabID);
-		var tabpane = document.getElementById(tabPaneID);
-		var ctx = canvas.getContext('2d');          　
-        var reader = new FileReader();              
-        reader.onload = function(event) {
-			tab.textContent = files[0].name;           
-            var img = new Image();                 
-            img.onload = function() {              
-                canvas.width = img.naturalWidth;
-				canvas.height = img.naturalHeight; 
-				canvas_tmp.width = img.naturalWidth;
-				canvas_tmp.height = img.naturalHeight;
-				canvas_Rect.width = img.naturalWidth;
-				canvas_Rect.height = img.naturalHeight;
-                //canvas.style.width = canvas.width + "px";
-				//canvas.style.height = canvas.height + "px";    
-				ctx.drawImage(img, 0, 0); 
-				console.log(canvas.style.width + "," + canvas.style.height + ":" + canvas.width + "," + canvas.height);
-				
-            }                                     　
-            img.src = event.target.result;  
-            canvas.isDrawingMode = true;
-			     　
-        }                                           
-        reader.readAsDataURL(files[0]);
-		console.log('.nav-tabs a[href="#' + tabID + '"]');
-		$("#" + tabID).tab('show');
-
-		var node = {};
-		node.text = tab.textContent;
-		node.icon = "bi bi-images";
-		//node.nodes = [];
-		ProjectTree[0].nodes.push(node);
-		$('#tree').change();
-		//console.log(node);
-		//var targetTab = document.getElementById(tabID);
-		//targetTab.tab('show');
-		//activeTab(tabID);
-		//tab.className = "nav-link active";
-		//tab.setAttribute("aria-selected", "true");
-		//tabpane.className = "tab-pane active";
-		//jQuery('#' + tabID).attr('aria-expanded', true);
-		//tab.attributes('aria-expanded') = "true";
-    }
-
+    
 	function getTree() {
   		// Some logic to retrieve, or generate tree structure
   		return ProjectTree;
@@ -157,211 +116,7 @@
 		alert(canvasName);
 	}
 
-	// Rectangle
-	function struct(func) {
-		return function() {
-			var f = new func();
-			func.apply(f, arguments); // (C)
-			return f;
-		}; // (B)
-	}
-
-	var Rect = struct(function Rect(x, y, width, height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-	});
-
-	function getRectangle(){
-		var r = new Rect(0, 0, 0, 0);
-		max_x = 0;
-		min_x = 9999999;
-		max_y = 0;
-		min_y = 9999999;
-
-		for(i=0; i<pointX.length; i++){
-			if(pointX[i] > max_x) max_x = pointX[i];
-			if(pointX[i] < min_x) min_x = pointX[i];
-		}
-		for(i=0; i<pointX.length; i++){
-			if(pointY[i] > max_y) max_y = pointY[i];
-			if(pointY[i] < min_y) min_y = pointY[i];
-		}
-		r.x = min_x;
-		r.y = min_y;
-		r.width = max_x - min_x;
-		r.height = max_y - min_y;
-
-		return r;
-	}
-
-	function GetRactangleImage(originalCanvas, extractionCanvas, rectCanvas,rect){
-		var ocContext = originalCanvas.getContext('2d');
-		var exContext = extractionCanvas.getContext('2d');
-		var moContext = originalCanvas.getContext('2d');
-		var reContext = rectCanvas.getContext('2d');
-		var ocImage = ocContext.getImageData(rect.x, rect.y, rect.width, rect.height);
-		var exImage = exContext.getImageData(rect.x, rect.y, rect.width, rect.height);
-		var moImage = moContext.getImageData(rect.x, rect.y, rect.width, rect.height);
-		
-		BinarizationImage(moImage);
-		var outImage = CompRectImage(ocImage, exImage, moImage, ocImage.width, ocImage.height);
-		drawRect(rectCanvas, reContext, rect);
-		clearCanvas(extractionCanvas);
-		var sideCanvasID = CreateCanvas();
-		var canvas_tmp = document.getElementById(sideCanvasID); 
-        var ctx_tmp = canvas_tmp.getContext('2d');
-		canvas_tmp.height = outImage.height;
-		canvas_tmp.width = outImage.width;
-		canvas_tmp.style.width = '30%';
-		ctx_tmp.putImageData(outImage, 0, 0);       
-	}
-
-	//2値化処理
-	function BinarizationImage(ImageData){
-		//モノクロ変換
-		for( i=0; i<ImageData.height; i++){
-			for(j=0; j<ImageData.width; j++){
-				var index = (j + i * ImageData.width) * 4;
-				var R = ImageData.data[index + 0];
-				var G = ImageData.data[index + 1];
-				var B = ImageData.data[index + 2];
-				var A = ImageData.data[index + 3];
-
-				ImageData.data[index + 0] = 0.30*R + 0.59*G + 0.11*B;
-				ImageData.data[index + 1] = 0.30*R + 0.59*G + 0.11*B;
-				ImageData.data[index + 2] = 0.30*R + 0.59*G + 0.11*B;
-			}
-		}
-
-		//判別分析
-		var sb2_max = 0;
-		for (t_num = 0; t_num < 256; t_num++){
-			var sb2 = 0.0;
-			var w0 = 0.0;
-			var w1 = 0.0;
-			var m0 = 0.0;
-			var m1 = 0.0;
-			var class0 = 0;
-			var class1 = 0;
-			var sum0 = 0;
-			var sum1 = 0;
-			var ave0 = 0;
-			var ave1 = 0;
-			for( i = 0; i < ImageData.height; i ++){
-				for( j = 0; j < ImageData.width; j ++){
-					var index = (j + i * ImageData.width) * 4;
-					if(ImageData.data[index + 0] < t_num){
-						sum0 += ImageData.data[index + 0];
-						class0 ++;
-					}else{
-						sum1 += ImageData.data[index + 0];
-						class1 ++;
-					}
-				}
-			}
-			w0 = class0/(ImageData.width * ImageData.height);
-			w1 = class1/(ImageData.width * ImageData.height);
-			if(class0 == 0){
-				m0 = 0;
-			}else{
-				m0 = sum0/class0;
-			}
-			if(class1 == 0){
-				m1 = 0;
-			}else{
-				m1 = sum1/class1;
-			}
-			sb2 = w0 * w1 * (m0 - m1) * (m0 - m1);
-			if(sb2 > sb2_max){
-				sb2_max = sb2;
-				t = t_num;
-			}
-		}
-
-		for( i=0; i<ImageData.height; i++){
-			for(j=0; j<ImageData.width; j++){
-				var index = (j + i * ImageData.width) * 4;
-				var R = ImageData.data[index + 0];
-				var a;
-				if(R < t){
-					a = 0;
-				}else{
-					a = 255;
-				}
-				ImageData.data[index + 0] = a;
-				ImageData.data[index + 1] = a;
-				ImageData.data[index + 2] = a;
-			}
-		}
-		 　
-	}
 	
-	//矩形、モノクロ画像を作り、文字を抽出
-	function CompRectImage(ocImage, exImage, moImage, width, height){
-		var outImage = new ImageData(width, height);
-
-		for( i=0; i<ocImage.height; i++){
-			for(j=0; j<ocImage.width; j++){
-				var index = (j + i * width) * 4;
-				var ocR = ocImage.data[index + 0];
-				var ocG = ocImage.data[index + 1];
-				var ocB = ocImage.data[index + 2];
-				var ocA = ocImage.data[index + 3];
-				var exR = exImage.data[index + 0];
-				var exG = exImage.data[index + 1];
-				var exB = exImage.data[index + 2];
-				var moB = moImage.data[index + 0];
-
-				if(exB > 250 && moB == 0){
-					outImage.data[index + 0] = ocR;
-					outImage.data[index + 1] = ocG;
-					outImage.data[index + 2] = ocB;
-					outImage.data[index + 3] = ocA;
-				}
-			}
-		}
-
-		return(outImage);
-//		var canvas_tmp = document.getElementById("chara"); 
-//        var ctx_tmp = canvas_tmp.getContext('2d');
-//		canvas_tmp.height = outImage.height;
-//		canvas_tmp.width = outImage.width;
-//		ctx_tmp.putImageData(outImage, 0, 0);       
-		   　
-	}
-	var ProjectTree = [];
-	var rootnode = {};
-	rootnode.text = "Myproject";
-	rootnode.nodes = [];
-	
-	var imageNode = {};
-	imageNode.text = "MyImage1";
-	imageNode.icon = "bi bi-images";
-	imageNode.nodes = [];
-
-	var charaNode1 = {};
-	charaNode1.text = "myChara1";
-	charaNode1.icon = "bi bi-image";
-
-	var charaNode2 = {};
-	charaNode2.text = "myChara2";
-	charaNode2.icon = "bi bi-image";
-
-	var pronode = {};
-	pronode.text = "tabtab";
-	pronode.icon = "bi bi-images";
-	ProjectTree.push(rootnode);
-	ProjectTree[0].nodes.push(imageNode);
-	ProjectTree[0].nodes[0].nodes.push(charaNode1);
-	ProjectTree[0].nodes[0].nodes.push(charaNode2);
-	//UpdateTree();
-	
-	ProjectTree[0].nodes.push(pronode);
-
-	//UpdateTree();
-
     var mamDraw=[];
     mamDraw.isMouseDown=false;
     mamDraw.position=[];
@@ -374,24 +129,10 @@
 	let pointY = [];
 
 	var SideBarNum = 0;
-    window.addEventListener("load",function(){
-        //初期設定
-        mamDraw.canvas=document.getElementById("tmp");
-        mamDraw.canvas.addEventListener("touchstart",onDown);
-        mamDraw.canvas.addEventListener("touchmove",onMove);
-        mamDraw.canvas.addEventListener("touchend",onUp);
-        mamDraw.canvas.addEventListener("mousedown",onMouseDown);
-        mamDraw.canvas.addEventListener("mousemove",onMouseMove);
-        mamDraw.canvas.addEventListener("mouseup",onMouseUp);
-        window.addEventListener("mousemove",StopShake);
-        mamDraw.context=mamDraw.canvas.getContext("2d");
-        mamDraw.context.strokeStyle="#000000";
-        mamDraw.context.lineWidth=5;
-        mamDraw.context.lineJoin="round";
-        mamDraw.context.lineCap="round";
-        //document.getElementById("clearCanvas").addEventListener("click",clearCanvas);
-    });
-    function StopShake(event){
+
+	var nowID;
+	
+	function StopShake(event){
         mamDraw.isMouseDown=false;
         event.stopPropagation();
     }
@@ -457,27 +198,38 @@
         }
     }
     function onUp(event){
-        mamDraw.isMouseDown=false;
-		fillPath();
-		var rect = getRectangle();
-		console.log(rect);
-        var canvas = document.getElementById('cnvs');
-		var rect_canvas = document.getElementById('ex_rect');
-		GetRactangleImage(canvas, mamDraw.canvas, rect_canvas, rect);
-		pointX = [];
-		pointY = [];
-		event.stopPropagation();
+        onMouseUp(event);
+		//mamDraw.isMouseDown=false;
+		//fillPath();
+		//var rect = getRectangle(pointX, pointY);
+		//var canvas = document.getElementById("src_cnvs_" + nowID);
+		//var rect_canvas = document.getElementById("exr_cnvs_" + nowID);
+		//var outImage = GetRectangleImage(canvas, mamDraw.canvas, rect_canvas, rect);
+		//createSideCanvas(outImage);
+		//pointX = [];
+		//pointY = [];
+		//event.stopPropagation();
     }
     
-    
+    function createSideCanvas(outImage){
+		var sideCanvasID = CreateCanvas();
+		var canvas_tmp = document.getElementById(sideCanvasID); 
+		var ctx_tmp = canvas_tmp.getContext('2d');
+		canvas_tmp.height = outImage.height;
+		canvas_tmp.width = outImage.width;
+		canvas_tmp.style.width = '30%';
+		ctx_tmp.putImageData(outImage, 0, 0); 
+	}
     function onMouseUp(event){
         mamDraw.isMouseDown=false;
 		fillPath();
-		var rect = getRectangle();
-		console.log(rect);
-        var canvas = document.getElementById('cnvs');
-		var rect_canvas = document.getElementById('ex_rect');
-		GetRactangleImage(canvas, mamDraw.canvas, rect_canvas, rect);
+		var rect = getRectangle(pointX, pointY);
+		var canvas = document.getElementById("src_cnvs_" + nowID);
+		var rect_canvas = document.getElementById("exr_cnvs_" + nowID);
+		var outImage = GetRectangleImage(canvas, mamDraw.canvas, rect_canvas, rect);
+		createSideCanvas(outImage);
+		add_NewChara(nowID, outImage);
+		
 		pointX = [];
 		pointY = [];
 		event.stopPropagation();
@@ -496,60 +248,14 @@
         mamDraw.context.stroke();
     }
 
-	function AddTab(targetID)
-	{	
-		var TabRoot = document.getElementById("tab-root");
-		
-		// テキスト情報を作成
-		var anchor = document.createElement("a");
-		anchor.href = '#photo_' + targetID;
-		anchor.id = "tab_" + targetID;
-		anchor.className = 'nav-link';
-		anchor.setAttribute('data-bs-toggle', 'tab');
-		anchor.setAttribute('role', 'tab');
-		anchor.setAttribute('aria-controls', 'photo_' + targetID);
-		anchor.setAttribute('aria-selected', 'false');
-		anchor.textContent = targetID + ' ';
-		// close button
-		var span = document.createElement("span");
-		span.className = 'close';
-		span.textContent = '×';
-		anchor.appendChild(span);
-
-		// tab-root要素に追加
-		TabRoot.appendChild(anchor);
-		
-		// add tab page
-		var tabpage_root = document.getElementById('tabpage-root');
-		var tabpage = document.createElement("div");
-		tabpage.className = "tab-pane";
-		tabpage.id = "photo_" + targetID;
-		
-		// add canvas
-		var new_canvas = document.createElement("canvas");
-		new_canvas.id = "new";
-		new_canvas.style = "border:1px solid #aaa";
-		new_canvas.class = "img-fluid";
-
-		// canvas copy to new_canvas
-		var src_canvas = document.getElementById(targetID);
-		var src_ctx = src_canvas.getContext('2d');
-		var new_ctx = new_canvas.getContext('2d');
-		new_canvas.width = src_canvas.width;
-		new_canvas.height = src_canvas.height;
-		var img = src_ctx.getImageData(0, 0, src_canvas.width, src_canvas.height);
-		new_ctx.putImageData(img, 0, 0);  　
-        
-		tabpage.appendChild(new_canvas);
-		tabpage_root.appendChild(tabpage);
-
-		// target tab show
-		$("#tab_" + targetID).tab('show');
-	}
 	function SideBarDblClick(e){
-		console.log(e.target.id);
-		//add tabs
-		AddTab(e.target.id);
+		//console.log(e.target.id);
+		// get imageData from SideCanvas
+		var cnvs = document.getElementById(e.target.id);
+		var ctx = cnvs.getContext('2d');
+		var img = ctx.getImageData(0, 0, cnvs.width, cnvs.height);
+		//create charactor tabs
+		createNewTab_CharaImage('tab-root', 'tabpage-root', e.target.id, img);
 	}
 	// Create Canvas
 	function CreateCanvas(){
@@ -578,9 +284,9 @@
 		ProjectTree[0].nodes.push(node);
 		**/
 		// set treeview
-		var node = {};
-		node.text = strCanvasID;
-		node.icon = "bi bi-image";
+		//var node = {};
+		//node.text = strCanvasID;
+		//node.icon = "bi bi-image";
 
 		//var charaNode1 = {};
 		//charaNode1.text = "myChara1";
@@ -590,36 +296,15 @@
 		//charaNode2.text = "myChara2";
 		//charaNode2.icon = "bi bi-image";
 
-		ProjectTree[0].nodes[0].nodes.push(node);
+		//ProjectTree[0].nodes[0].nodes.push(node);
 		//ProjectTree[0].nodes[0].nodes.push(charaNode1);
 		//ProjectTree[0].nodes[0].nodes.push(charaNode2);
 
-		$('#tree').change();
+		//$('#tree').change();
 		return(strCanvasID);
 	}
 
-	function drawRect(rectCanvas, rectContext, rect){
-        var scaleWidth = rectCanvas.clientWidth / rectCanvas.width;
-		var scaleHeight = rectCanvas.clientHeight/ rectCanvas.height;
-		rectContext.strokeStyle="red";
-		rectContext.setLineDash([5 / scaleWidth, 5 / scaleWidth]);
-        rectContext.lineWidth=2 / scaleWidth;
-        rectContext.lineJoin="round";
-        rectContext.lineCap="round";
-        rectContext.beginPath();
-        
-		rectContext.rect(rect.x, rect.y, rect.width, rect.height);
-
-		rectContext.stroke();
-		//console.log("aaaa");
-    }
-
-	function clearCanvas(canvas)
-	{
-		var ctx = canvas.getContext("2d");
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-	}
-
+	
 	function fillPath(){
 		mamDraw.context.beginPath();
 		mamDraw.context.moveTo(pointX[0], pointY[0]);
@@ -630,17 +315,8 @@
 		mamDraw.context.fillStyle = 'rgb(0, 0, 255)';
 		mamDraw.context.fill();
 	}
-	/***
-    function clearCanvas(){
-        //mamDraw.context.fillStyle="rgb(255,255,255)";
-        mamDraw.context.clearRect(
-			0,0,
-			mamDraw.canvas.getBoundingClientRect().width,
-			mamDraw.canvas.getBoundingClientRect().height
-        );
-    }
-	***/
-    function mamGetScrollPosition() {
+	
+	function mamGetScrollPosition() {
         return {
         "x":document.documentElement.scrollLeft || document.body.scrollLeft,
         "y":document.documentElement.scrollTop  || document.body.scrollTop
@@ -666,6 +342,18 @@
 		});
 		***/
 	}
+
+	window.onload = function(){
+		init_ProjectObj("No Name Project...");
+		/**
+		add_NewImage("NewImage desu", "");
+		add_NewChara("NewChara 1", "");
+		add_NewChara("NewChara 2", "");
+		add_NewChara("NewChara 3", "");
+		console.log(ProjectObj);
+		***/
+		$('#tree').change();
+	}
     </script>
     
 </head>
@@ -688,7 +376,8 @@
                 <li><a class="dropdown-item" href="javascript:LoadImageFile('cnvs');">
 					<label>
 						画像を読み込む
-						<input type="file" id="file" style="display: none;" onchange="LoadImageFile(this.files, 'cnvs', 'pTab1', 'tab1', 'photo1')">
+						<!-- <input type="file" id="file" style="display: none;" onchange="LoadImageFile(this.files, 'cnvs', 'pTab1', 'tab1', 'photo1')"> -->
+						<input type="file" id="file" style="display: none;" onchange="LoadImageFile(this.files, 'tab-root', 'tabpage-root')">
 					</label>
 				</a></li>
 				<li><a class="dropdown-item" href="javascript:new_node();">
@@ -703,6 +392,7 @@
 				<li><a class="dropdown-item" href="#">Something else here</a></li>
 			</ul>
 		  </li>
+		  <!--
 		  <li class="nav-item">
 			<a class="nav-link" href="#">Features</a>
 		  </li>
@@ -719,6 +409,7 @@
 			  <li><a class="dropdown-item" href="#">Something else here</a></li>
 			</ul>
 		  </li>
+		  -->
 		</ul>
 	  </div>
 	</div><!-- /.container-fluid -->
@@ -741,11 +432,14 @@
 		<div class="col-7">
 			<!-- <ul id="tab-root" class="nav nav-tabs nav-inverse"> -->
 			<div class="nav nav-tabs" id="tab-root" role="tablist">
+				<!--
 				<a class="nav-link" id="tab1" data-bs-toggle="tab" href="#photo1" role="tab" aria-controls="photo1" aria-selected="false">tab1</a>
+				-->
 			</div>
 			
 			<!-- パネル部分 -->
 			<div id="tabpage-root" class="tab-content">
+				<!--	
 				<div id="photo1" class="tab-pane">
 					<div class="canvas-wrapper">
 						<canvas id="cnvs" style="border:1px solid #aaa" class="img-fluid"></canvas>
@@ -753,6 +447,7 @@
 						<canvas id="tmp" style="border:1px solid #aaa" class="img-fluid"></canvas>
 					</div>	
 				</div>
+				-->
 			</div>
 			<!--
 			<ul id="tab-root" class="nav nav-tabs">
@@ -787,13 +482,14 @@
 			</div>
 			-->
 		</div>
-		<div id='rightSide' class="col-3">
+		<div id='rightSide' class="overflow-auto col-3">
 			ImageFiles<br>
 		</div>
 		<!-- 4個分のタブ -->
 	</main>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 	<script>
+		//$('#tree').on('nodeSelected', SelectNode);
 		$('#tree').change(function(){
 			$('#tree').treeview({
           		color: "#428bca",
@@ -802,7 +498,8 @@
 				collapseIcon: 'bi bi-caret-down-fill',
 				nodeIcon: 'bi bi-folder2-open',
 				showBorder: false,
-				data: ProjectTree
+				onNodeSelected: SelectNode,
+				data: ProjectObj
         	});
 		});
 		$('#tree').change();
