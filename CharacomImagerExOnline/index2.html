@@ -53,90 +53,6 @@
 	}
 
     
-	function getTree() {
-  		// Some logic to retrieve, or generate tree structure
-  		return ProjectTree;
-	}
-
-	function UpdateTree()
-	{
-		//$('#tree').treeview('remove');
-		console.log(getTree());
-		var www_test_tree = [
-			{
-				text: "Parent 1",
-				nodes: [
-					{
-						text: "Child 1",
-						icon: 'bi bi-images',
-						nodes: [
-							{
-								text: "Grandchild 1",
-								icon: 'bi bi-image'
-							},
-							{
-								text: "Grandchild 2",
-								icon: 'bi bi-image'
-							}
-						]
-					},
-					{
-						text: "Child 2",
-						icon: 'bi bi-images'
-					}
-				]
-			},
-			{
-				text: "Parent 2"
-			},
-			{
-				text: "Parent 3"
-			},
-			{
-				text: "Parent 4"
-			},
-			{
-				text: "Parent 5"
-			}];
-		//tt.treeview({data: ProjectTree});
-		$('#tree').treeview({
-			color: "#428bca",
-			levels: 3,
-			expandIcon: 'bi i-caret-right-fill',
-			collapseIcon: 'bi bi-caret-down-fill',
-			nodeIcon: 'bi bi-folder2-open',
-			showBorder: false,
-			data: www_test_tree
-		});
-		
-		$('#tree').change();
-		//$('#tree').treeview('enableAll', true);
-		//$('#tree').treeview(true);
-		//console.log(test2_tree);
-		//console.log(ProjectTree);
-		//console.log(JSON.stringify(ProjectTree));
-		//console.log(test_tree);
-		//console.log(JSON.stringify(test_tree));
-	}
-	function SizeChange(canvasName){
-		var canvas = document.getElementById(canvasName);
-		canvas.width = 700;
-		canvas.height = 500;
-		alert(canvasName);
-	}
-
-	
-    var mamDraw=[];
-    mamDraw.isMouseDown=false;
-    mamDraw.position=[];
-    mamDraw.position.x=0;
-    mamDraw.position.y=0;
-    mamDraw.position.px=0;
-    mamDraw.position.py=0;
-
-	let pointX = [];
-	let pointY = [];
-
 	var SideBarNum = 0;
 
 	var nowID;
@@ -145,127 +61,7 @@
         mamDraw.isMouseDown=false;
         event.stopPropagation();
     }
-
-    function onDown(event){
-        var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
-		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
-		mamDraw.position.px=(event.touches[0].pageX-event.target.getBoundingClientRect().left-mamGetScrollPosition().x)/scaleWidth;
-        mamDraw.position.py=(event.touches[0].pageY-event.target.getBoundingClientRect().top -mamGetScrollPosition().y)/scaleHeight;
-        if(mamDraw.isMouseDown == true) drawLine();
-        mamDraw.position.x=mamDraw.position.px;
-        mamDraw.position.y=mamDraw.position.py;
-		pointX.push(mamDraw.position.x);
-		pointY.push(mamDraw.position.y);
-        mamDraw.isMouseDown=true;
-		event.preventDefault();
-        event.stopPropagation();
-    }
-	function onMouseDown(event){
-        var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
-		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
-		mamDraw.position.px=(event.clientX-event.target.getBoundingClientRect().left)/scaleWidth;
-        mamDraw.position.py=(event.clientY-event.target.getBoundingClientRect().top)/scaleHeight;
-        if(mamDraw.isMouseDown == true) drawLine();
-        mamDraw.position.x=mamDraw.position.px;
-        mamDraw.position.y=mamDraw.position.py;
-        pointX.push(mamDraw.position.x);
-		pointY.push(mamDraw.position.y);
-        mamDraw.isMouseDown=true;
-        event.stopPropagation();
-    }
-
-    function onMove(event){
-        if(mamDraw.isMouseDown){
-			var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
-			var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
-			mamDraw.position.px=(event.touches[0].pageX-event.target.getBoundingClientRect().left-mamGetScrollPosition().x)/scaleWidth;
-        	mamDraw.position.py=(event.touches[0].pageY-event.target.getBoundingClientRect().top -mamGetScrollPosition().y)/scaleHeight;
-        	drawLine();
-			mamDraw.position.x=mamDraw.position.px;
-        	mamDraw.position.y=mamDraw.position.py;
-        	pointX.push(mamDraw.position.x);
-			pointY.push(mamDraw.position.y);
-			mamDraw.position.px=mamDraw.position.x;
-			mamDraw.position.py=mamDraw.position.y;
-			event.stopPropagation();
-        }
-    }
-	function onMouseMove(event){
-        if(mamDraw.isMouseDown){
-			var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
-			var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
-			mamDraw.position.px=(event.clientX-event.target.getBoundingClientRect().left)/scaleWidth;
-        	mamDraw.position.py=(event.clientY-event.target.getBoundingClientRect().top)/scaleHeight;
-        	drawLine();
-			mamDraw.position.x=mamDraw.position.px;
-        	mamDraw.position.y=mamDraw.position.py;
-        	pointX.push(mamDraw.position.x);
-			pointY.push(mamDraw.position.y);
-			mamDraw.position.px=mamDraw.position.x;
-			mamDraw.position.py=mamDraw.position.y;
-			event.stopPropagation();
-        }
-    }
-    function onUp(event){
-        onMouseUp(event);
-		//mamDraw.isMouseDown=false;
-		//fillPath();
-		//var rect = getRectangle(pointX, pointY);
-		//var canvas = document.getElementById("src_cnvs_" + nowID);
-		//var rect_canvas = document.getElementById("exr_cnvs_" + nowID);
-		//var outImage = GetRectangleImage(canvas, mamDraw.canvas, rect_canvas, rect);
-		//createSideCanvas(outImage);
-		//pointX = [];
-		//pointY = [];
-		//event.stopPropagation();
-    }
     
-    
-    function onMouseUp(event){
-        mamDraw.isMouseDown=false;
-		fillPath();
-		var rect = getRectangle(pointX, pointY);
-		var canvas = document.getElementById("src_cnvs_" + ProjectObj[nowProjectID].nodes[nowImageID].name);
-		var rect_canvas = document.getElementById("exr_cnvs_" + ProjectObj[nowProjectID].nodes[nowImageID].name);
-		var outImage = GetRectangleImage(canvas, mamDraw.canvas, rect_canvas, rect);
-		var charaID = add_NewChara(outImage);
-		createSideCanvas(charaID, outImage);
-		
-		pointX = [];
-		pointY = [];
-		event.stopPropagation();
-    }
-    function drawLine(){
-        var scaleWidth = mamDraw.canvas.clientWidth / mamDraw.canvas.width;
-		var scaleHeight = mamDraw.canvas.clientHeight/ mamDraw.canvas.height;
-		mamDraw.context.strokeStyle="#000000";
-		mamDraw.context.setLineDash([2, 2]);
-        mamDraw.context.lineWidth=2 / scaleWidth;
-        mamDraw.context.lineJoin="round";
-        mamDraw.context.lineCap="round";
-        mamDraw.context.beginPath();
-        mamDraw.context.moveTo(mamDraw.position.px,mamDraw.position.py);
-        mamDraw.context.lineTo(mamDraw.position.x,mamDraw.position.y);
-        mamDraw.context.stroke();
-    }
-	
-	function fillPath(){
-		mamDraw.context.beginPath();
-		mamDraw.context.moveTo(pointX[0], pointY[0]);
-		for(i=1; i<pointX.length; i++){
-			mamDraw.context.lineTo(pointX[i], pointY[i]);
-		}
-		mamDraw.context.closePath();
-		mamDraw.context.fillStyle = 'rgb(0, 0, 255)';
-		mamDraw.context.fill();
-	}
-	
-	function mamGetScrollPosition() {
-        return {
-        "x":document.documentElement.scrollLeft || document.body.scrollLeft,
-        "y":document.documentElement.scrollTop  || document.body.scrollTop
-        };
-    }
 
 	
 	window.onload = function(){
@@ -408,9 +204,15 @@
 					nowImageID = node.id;
 					addListener("tmp_cnvs_" + e.target.id.substr(4));
 					deleteAllSideCanvas('rightSide');
+					createAllSideCanvas('rightSide');
 					//console.log("level = image");
 				}
 				if(node.level == "chara"){
+					nowProjectID = node.projectID;
+					nowImageID = node.imageID;
+					addListener("chr_cnvs_" + e.target.id.substr(4));
+					deleteAllSideCanvas('rightSide');
+					createAllSideCanvas('rightSide');
 					//console.log("level = chara");
 				}
 				//console.log("checkNODE = " + node.name + "," + node.level);

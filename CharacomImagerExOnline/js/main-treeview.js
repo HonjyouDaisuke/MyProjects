@@ -61,6 +61,15 @@ function add_NewChara(imageData) {
     return(charaNode.text);
 }
 
+function setCurrentImage(level, imageData) {
+    if (level == "image") {
+        ProjectObj[nowProjectID].nodes[nowImageID].imageData = imageData;
+    }
+    if (level == "chara") {
+        ProjectObj[nowProjectID].nodes[nowImageID].nodes[nowCharaID].imageData = imageData;
+    }
+
+}
 function NodeSelect(name){
     var i=0;
     var j=0;
@@ -71,14 +80,14 @@ function NodeSelect(name){
         ProjectObj[0].nodes.forEach(element => {
             if(element.name == name){
                 //console.log("Get! element" + name);
-                node = element;
+                node = Object.assign({}, element);
             }
             //console.log("element check => " + element.name + ":" + name);
             if('nodes' in element){
                 element.nodes.forEach(child => {
                     if(child.name == name){
                         //console.log("Get! child" + name);
-                        node = child;
+                        node = Object.assign({}, child);
                     }
                     //console.log("child check => " + child.name + ": " + name);
                 });
@@ -126,26 +135,23 @@ function SelectNode(e, data){
     console.log("text = " + data.text);
 }
 
-function GetNodeIDFromNode(NodeName){
-    var i = 1;
-    var nodeID = 1;
-    if('nodes' in ProjectObj[0]){
-        ProjectObj[0].nodes.forEach(element => {
-            if(element.name == NodeName){
-                nodeID = i;
+function getNodeFromID(nodeID){
+    var retNode
+
+    if('nodes' in ProjectObj[nowProjectID]){
+        ProjectObj[nowProjectID].nodes.forEach(element => {
+            if(element.id == nodeID){
+                retNode = element;
             }
-            i = i + 1;
-            //console.log("element check => " + element.name + ":" + name);
             if('nodes' in element){
                 element.nodes.forEach(child => {
-                    if(child.name == name){
-                        nodeID = i
+                    if(child.id == nodeID){
+                        retNode = child;
                     }
-                    i = i + 1;
                     //console.log("child check => " + child.name + ": " + name);
                 });
             }
         });
     }
-    return(nodeID);
+    return(retNode);
 }

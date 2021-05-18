@@ -54,3 +54,12 @@ function SideBarDblClick(e){
         createNewTab_CharaImage('tab-root', 'tabpage-root', e.target.id, img);
     }
 }
+
+function createAllSideCanvas(sideCanvasRootID){
+    if('nodes' in ProjectObj[nowProjectID].nodes[nowImageID]){
+        ProjectObj[nowProjectID].nodes[nowImageID].nodes.forEach(charaNode =>{
+            createSideCanvas(charaNode.name, charaNode.imageData);
+            console.log("chara side create..." + charaNode.name);
+        });
+    }
+}
