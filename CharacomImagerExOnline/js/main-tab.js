@@ -19,6 +19,12 @@ function createNewTab_MainImage(tabRootID, tabpageRootID, newTabID) {
     anchor.setAttribute('aria-selected', 'false');
     anchor.textContent = newTabID;
     // close button
+    var span = document.createElement("button");
+    span.type = 'button';
+    span.className = "btn-close";
+    span.setAttribute('aria-label', 'Close');
+    span.setAttribute('onclick', 'close_Tab(this)');
+    anchor.appendChild(span);
     //var span = document.createElement("span");
     //span.className = 'close';
     //span.textContent = '×';
@@ -82,9 +88,10 @@ function createNewTab_CharaImage(tabRootID, tabpageRootID, newTabID, image_data)
     anchor.setAttribute('aria-selected', 'false');
     anchor.textContent = newTabID + ' ';
     // close button
-    var span = document.createElement("span");
-    span.className = 'close';
-    span.textContent = '×';
+    var span = document.createElement("button");
+    span.type = 'button';
+    span.className = "btn-close";
+    span.setAttribute('aria-label',  'Close');
     anchor.appendChild(span);
 
     // tab-root要素に追加
@@ -129,4 +136,15 @@ function exist_TabFromID(tabRootID, tabID) {
         }
     });
     return(bRet);
+}
+
+function close_Tab(tab_id){
+    var tabContentId = $(tab_id).parent().attr("href");
+    //var li_list = $(tab_id).parent().parent().parent();
+    //$(tab_id).parent().parent().remove(); //remove li of tab
+    //if ($(tabContentId).is(":visible")) {
+    //    li_list.find("a").eq(0).tab('show'); // Select first tab
+    //}
+    console.log("close tab ... id = " + tabContentId);
+    $(tabContentId).remove(); //remove respective tab content
 }

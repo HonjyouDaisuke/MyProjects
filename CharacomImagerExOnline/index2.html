@@ -12,10 +12,13 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
 	<link rel="stylesheet" href="css/bootstrap-treeview.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.2/css/drawer.min.css">
+	<link rel="stylesheet" href="dist/bootstrap.colorpickersliders.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
 	<script src='js/bootstrap-treeview.js'></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/iScroll/5.2.0/iscroll.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.2/js/drawer.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.1/tinycolor.min.js"></script>
+	<script src="dist/bootstrap.colorpickersliders.min.js"></script>
 	<script src='js/image-effect.js'></script>
 	<script src='js/main-tab.js'></script>
 	<script src='js/main-treeview.js'></script>
@@ -75,7 +78,8 @@
 		***/
 		$('#tree').change();
 	}
-    </script>
+
+	</script>
     
 </head>
 <body id='main-body' class="drawer drawer--left">
@@ -152,6 +156,16 @@
 					</label>
 				</div>
 			</li>
+			<li>
+				<input type="text" id="hsvflatvector" value="">
+			</li>
+			<li>
+				<div class="btn-group-vertical" role="group" aria-label="Basic example">
+					<button type="button" class="btn btn-outline-primary"><img src="img/pensize1.png" alt="Pen 1" /></button>
+					<button type="button" class="btn btn-outline-primary"><img src="img/pensize5.png" alt="Pen 5" /></button>
+					<button type="button" class="btn btn-outline-primary"><img src="img/pensize11.png" alt="Pen 11" /></button>
+				</div>
+			</li>
 		  </ul>
 		</nav>
 	</header>
@@ -205,16 +219,19 @@
 					addListener("tmp_cnvs_" + e.target.id.substr(4));
 					deleteAllSideCanvas('rightSide');
 					createAllSideCanvas('rightSide');
-					//console.log("level = image");
+					console.log("level = image");
 				}
 				if(node.level == "chara"){
 					nowProjectID = node.projectID;
 					nowImageID = node.imageID;
+					nowCharaID = node.id;
 					addListener("chr_cnvs_" + e.target.id.substr(4));
 					deleteAllSideCanvas('rightSide');
 					createAllSideCanvas('rightSide');
 					console.log("level = chara");
-
+					console.log("node.id = " + node.id);
+					console.log("nowPoroject = " + nowProjectID + " : nowImageID = " + nowImageID + " : nowCharaID = " + nowCharaID);
+					console.log(node);
 				}
 				//console.log("checkNODE = " + node.name + "," + node.level);
 			}
@@ -225,6 +242,16 @@
   			$('.drawer').drawer();
 		});
 
+		$("#hsvflatvector").ColorPickerSliders({
+			color: "#F44336",
+			placement: 'right',
+			sliders: false,
+			swatches: ['#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5', '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#795548', '#9E9E9E', '#607D8B', '#000000', '#FFFFFF'],
+			customswatches: false,
+			hsvpanel: false
+		});
+		
+		
 	</script>
 </body>
 </html>
